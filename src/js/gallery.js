@@ -1,3 +1,7 @@
+import 'simplelightbox/dist/simple-lightbox.min.css';
+import 'simplelightbox/dist/simple-lightbox.min.js';
+import SimpleLightbox from 'simplelightbox';
+
 const Gallery = {
   images: [
     {
@@ -46,32 +50,44 @@ const Gallery = {
       description: 'Lighthouse Coast Sea',
     },
   ],
-  refs: {
-    list: document.querySelector('.gallery'),
+  get listEl() {
+    return document.querySelector('.gallery') ?? null;
   },
-
-  makeGalleryItemEl({ preview, original, description }) {
-    const liEl = document.createElement('li');
-    const aEl = document.createElement('a');
-    const imgEl = document.createElement('img');
-
-    liEl.classList.add('gallery__item');
-
-    aEl.classList.add('gallery__link');
-    aEl.href = original;
-
-    imgEl.classList.add('gallery__img');
-    imgEl.src = preview;
-    imgEl.dataset.source = original;
-    imgEl.alt = description;
-
-    aEl.append(imgEl);
-    liEl.append(aEl);
-
-    return liEl;
+  init() {
+    this.render();
+    this.initSLBInstance();
   },
-  makeGalleryEl() {},
-  renderGallery() {},
+  createItem({ preview, original, description }) {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    const img = document.createElement('img');
+
+    li.className = 'gallery__item';
+
+    a.className = 'gallery__link';
+    a.href = original;
+
+    img.className = 'gallery__img';
+    img.src = preview;
+    img.dataset.source = original;
+    img.alt = description;
+
+    a.append(img);
+    li.append(a);
+
+    return li;
+  },
+  render() {
+    const items = this.images.map(this.createItem.bind(this));
+    this.listEl?.append(...items);
+  },
+  initSLBInstance() {
+    const options = {
+      captionsData: 'alt',
+      captionDelay: 250,
+    };
+    new SimpleLightbox('.gallery a', options);
+  },
 };
 
-console.log(Gallery.makeGalleryItemEl(Gallery.images[0]));
+Gallery.init();
